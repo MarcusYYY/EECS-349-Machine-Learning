@@ -44,7 +44,8 @@ def breadth_first_search(root):
 			str1 += str(node.value) + " "
 			if node.children:
 				for i in node.children:
-					que.append(node.children[i])
+					que.append(node.children[i]
+  str1 = str1[:len(str1)-1])
 	return str1
 
 def tester():
