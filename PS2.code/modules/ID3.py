@@ -29,12 +29,11 @@ def check_homogenous(data_set):
     ========================================================================================================
      '''
     # Your code here
-    flag = data_set[0]
-    for i in range(2,len(data_set)):
-        if(flag != data_set[i]):
+    flag = data_set[0][0]
+    for i in data_set:
+        if i[0] != flag:
             return None
     return flag
-    pass
 # ======== Test Cases =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
 # check_homogenous(data_set) ==  None
@@ -56,8 +55,31 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
     Output: best attribute, split value if numeric
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    max_gainratio = 0
+    best_attribute = 0
+    best_numeric_split = 0
+
+    for attribute in range(1,len(data_set[0])):
+        is_nominal = attribute_metadata[attribute]['is_nominal']
+        if is_nominal:
+            gain_ratio = gain_ratio_nominal(data_set,attribute)
+            if gain_ratio > max_gainratio:
+                max_gainratio = gain_ratio
+                best_attribute = attribute
+        else:
+            gain_ratio,numeric_split = gain_ratio_numeric(data_set,attribute,2)
+            if gain_ratio > max_gainratio:
+                max_gainratio = gain_ratio
+                best_attribute = attribute
+                best_numeric_split = numeric_split
+
+    if max_gainratio == 0:
+            return False,False
+
+    if attribute_metadata[best_attribute]['is_nominal']:
+        return best_attribute,False
+    else:
+        return best_attribute,best_numeric_split
 
 # # ======== Test Cases =============================
 # numerical_splits_count = [20,20]
@@ -81,6 +103,18 @@ def mode(data_set):
     ========================================================================================================
     '''
     # Your code here
+    count_0 = 0
+    count_1 = 0
+    
+    for i in data_set:
+        if i[0] == 1:
+            count_1++
+        else:
+            count_0++
+    if count_0 > count_1:
+        return count_0
+    else:
+        return count_1
     pass
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
@@ -98,7 +132,19 @@ def entropy(data_set):
     Output: Returns entropy. See Textbook for formula
     ========================================================================================================
     '''
-
+    ent = 0
+    numCount = {}
+    for i in data_set:
+        if i[0] in numCount.keys():
+            numCount[i[0]] +=1
+        else:
+            numCount[i[0]] = 1
+    for i in numCount.keys():
+        if numCount[i] == len(data_set):
+            return 0
+        freq = (float)(numCount[i]) / (data_len)
+        ent += freq * math.log(freq,2)
+    return -ent
 
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[0],[1],[1],[1]]
@@ -120,6 +166,26 @@ def gain_ratio_nominal(data_set, attribute):
     ========================================================================================================
     '''
     # Your code here
+    numCount = {}
+    total = []
+    for i in data_set:
+        total.append([i[0]])
+        if i[attribute] in numCount.keys():
+            numCount[i[attribute]].append([i[0]])
+        else:
+            cache = []
+            cache.append([i[0]])
+            numCount[i[attribute]] = cache
+    sum_ = 0
+    IV = 0
+    t = len(total)
+    for i in numCount:
+        a = len(numCount[i])
+        sum_ += ((float)(a)/(t)) * entropy(numCount[i])
+        b = (float)(a)/(t)
+        IV -= b * math.log(b,2)
+    
+    return (entropy(total) - sum_)/IV
     pass
 # ======== Test case =============================
 # data_set, attr = [[1, 2], [1, 0], [1, 0], [0, 2], [0, 2], [0, 0], [1, 3], [0, 4], [0, 3], [1, 1]], 1
@@ -144,8 +210,31 @@ def gain_ratio_numeric(data_set, attribute, steps):
     Output: This function returns the gain ratio and threshold value
     ========================================================================================================
     '''
-    # Your code here
-    pass
+    max = 0
+    t = entropy(data_set)
+    tag = 0
+    IV = 0
+    idx = 0
+    while idx < len(data_set):
+        divide = split_on_numerical(data_set,attribute,data_set[idx][attribute])
+        part_low = entropy(divide[0])
+        part_high = entropy(divide[1])
+        len_up = len(divide[1])
+        len_down = len(divide[0])
+        a = float(len_up)/(len_up + len_down)
+        b = float(len_down)/(len_up + len_down)
+        total_entropy = part_low * b + part_high * a
+        max_ = (t - total_entropy)
+        if max_ > max:
+            max = max_
+            tag = data_set[idx][attribute]
+            IV = -a*log(a,2) - b*log(b,2)
+        idx += steps
+    if IV != 0:
+        return max/IV, tag
+    else:
+        return None
+
 # ======== Test case =============================
 # data_set,attr,step = [[0,0.05], [1,0.17], [1,0.64], [0,0.38], [0,0.19], [1,0.68], [1,0.69], [1,0.17], [1,0.4], [0,0.53]], 1, 2
 # gain_ratio_numeric(data_set,attr,step) == (0.31918053332474033, 0.64)
@@ -165,6 +254,16 @@ def split_on_nominal(data_set, attribute):
     ========================================================================================================
     '''
     # Your code here
+    count_Attribute = {}
+    for i in data_set:
+        if i[attribute] in count_Attribute.keys():
+            count_Attribute.append([i[0],i[attribute]])
+        else:
+            cache = []
+            cache.append([i[0],i[attribute]])
+            count_Attribute[i[attribute]] = cache
+    return count_Attribute
+
     pass
 # ======== Test case =============================
 # data_set, attr = [[0, 4], [1, 3], [1, 2], [0, 0], [0, 0], [0, 4], [1, 4], [0, 2], [1, 2], [0, 1]], 1
@@ -184,6 +283,18 @@ def split_on_numerical(data_set, attribute, splitting_value):
     ========================================================================================================
     '''
     # Your code here
+    count_Attribute = []
+    up = []
+    down = []
+    for i in data_set:
+        if i[attribute] < splitting_value:
+            down.append([i[0],i[attribute]])
+        else:
+            up.append([i[0],i[attribute]])
+    count_Attribute.append(down).append(up)
+
+    return count_Attribute      
+
     pass
 # ======== Test case =============================
 # d_set,a,sval = [[1, 0.25], [1, 0.89], [0, 0.93], [0, 0.48], [1, 0.19], [1, 0.49], [0, 0.6], [0, 0.6], [1, 0.34], [1, 0.19]],1,0.48
