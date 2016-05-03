@@ -13,10 +13,112 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
     ========================================================================================================
     Output: The node representing the decision tree learned over the given data set
     ========================================================================================================
-
     '''
     # Your code here
-    pass
+    for attribute in range(0,len(data_set[0])):
+        handle_unknown(attribute,data_set,attribute_metadata)
+
+    d_tree = ID3_helper(data_set, attribute_metadata, numerical_splits_count, depth)
+    return d_tree
+
+
+def ID3_helper(data_set, attribute_metadata, numerical_splits_count, depth):
+    classList = [example[-1] for example in data_set]
+    if classList.count(classList[0]) == len(classList):
+        return classList[0]
+    if len(data_set[0]) == 1
+        return mode(classList)
+
+    bestFeature , best_split = pick_best_attribute(data_set, attribute_metadata, numerical_splits_count)
+    bestFeature_name = attribute_metadata[bestFeature]
+    myTree = {bestFeature_name:{}}
+    featValues = [example[bestFeature] for example in data_set]
+    uniqueFeatValues = set(featValues)
+    del (attribute_metadata[bestFeature])
+    for values in uniqueFeatValues:
+        subData_set = splitDataSet(data_set,bestFeature,values)
+        myTree[bestFeature_name][values] = ID3_helper(subData_set,attribute_metadata)
+    return myTree
+
+
+def splitDataSet(data_set,attribute,values):
+    retDataSet = []
+    for featVec in data_set:
+        if featVec[attribute] == values:
+            reducedFeatVec = featVec[:attribute]
+            reducedFeatVec.extend(featVec[attribute+1:])
+            retDataSet.append(reducedFeatVec)
+    return retDataSet
+
+
+
+
+
+    
+
+def handle_unknown(attribute,data_set,attribute_metadata):
+
+    if attribute_metadata[attribute]['is_nominal']:
+        valFreq = {}
+        missing_idx = []
+        idx = 0
+        for i in data_set:
+            if i[attribute] != None:
+                if i[attribute] not in valFreq.keys():
+                    valFreq[i[attribute]] = 1
+                else:
+                    valFreq[i[attribute]] +=1
+            else:
+                missing_idx.append(idx)
+            idx += 1
+        max_ = 0
+        for key in valFreq.keys():
+            if valFreq[key] > max_:
+                max_ = valFreq[key]
+                major = key
+        for index in missing_idx:
+            data_set[index][attribute] = major
+    else:
+        sum_ = 0
+        len_ = 0
+        missing_idx = []
+        idx = 0
+        for i in data_set:
+            if i[attribute] != None:
+                sum_ += i[attribute]
+                len_ += 1
+            else:
+                missing_idx.append(idx)
+            idx += 1
+        mean_ = sum_ / len_
+        for index in missing_idx:
+            data_set[index][attribute] = mean_
+   
+# ======== Test Cases =============================
+# print "Test of handle_unknown"
+
+# attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "opprundifferential",'is_nominal': False}]
+# data_set = [[0],[1],[1],[None],[1],[1]]
+# handle_unknown(0,data_set,attribute_metadata)
+# pass_ = data_set == [[0],[1],[1],[1],[1],[1]]
+
+# if not pass_:
+#     print str(handle_unknown(0,data_set,attribute_metadata)) + " should be [[0],[1],[1],[1],[1],[1]] "
+# else:
+#     print "test1 passed"
+
+
+
+# data_set = [[0,2.7],[1,3.2],[1,4.0],[0,4.1],[1,4.0],[0,None]]
+# handle_unknown(1,data_set,attribute_metadata)
+# pass_ = data_set == [[0,2.7],[1,3.2],[1,4.0],[0,4.1],[1,4.0],[0,3.6]]
+# if not pass_:
+#     print str(handle_unknown(1,data_set,attribute_metadata)) + " should be [[0,2],[1,3],[1,4],[0,4],[1,4],[0,4]]"
+# else:
+#     print "test2 passed"
+
+
+
 
 def check_homogenous(data_set):
     '''
@@ -67,7 +169,7 @@ def pick_best_attribute(data_set, attribute_metadata, numerical_splits_count):
                 max_gainratio = gain_ratio
                 best_attribute = attribute
         else:
-            gain_ratio,numeric_split = gain_ratio_numeric(data_set,attribute,2)
+            gain_ratio,numeric_split = gain_ratio_numeric(data_set,attribute,1)
             if gain_ratio > max_gainratio:
                 max_gainratio = gain_ratio
                 best_attribute = attribute
@@ -115,7 +217,7 @@ def mode(data_set):
         return count_0
     else:
         return count_1
-    pass
+    
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
 # mode(data_set) == 1
@@ -186,7 +288,7 @@ def gain_ratio_nominal(data_set, attribute):
         IV -= b * math.log(b,2)
     
     return (entropy(total) - sum_)/IV
-    pass
+   
 # ======== Test case =============================
 # data_set, attr = [[1, 2], [1, 0], [1, 0], [0, 2], [0, 2], [0, 0], [1, 3], [0, 4], [0, 3], [1, 1]], 1
 # gain_ratio_nominal(data_set,attr) == 0.11470666361703151
@@ -264,7 +366,7 @@ def split_on_nominal(data_set, attribute):
             count_Attribute[i[attribute]] = cache
     return count_Attribute
 
-    pass
+    
 # ======== Test case =============================
 # data_set, attr = [[0, 4], [1, 3], [1, 2], [0, 0], [0, 0], [0, 4], [1, 4], [0, 2], [1, 2], [0, 1]], 1
 # split_on_nominal(data_set, attr) == {0: [[0, 0], [0, 0]], 1: [[0, 1]], 2: [[1, 2], [0, 2], [1, 2]], 3: [[1, 3]], 4: [[0, 4], [0, 4], [1, 4]]}
@@ -295,7 +397,7 @@ def split_on_numerical(data_set, attribute, splitting_value):
 
     return count_Attribute      
 
-    pass
+    
 # ======== Test case =============================
 # d_set,a,sval = [[1, 0.25], [1, 0.89], [0, 0.93], [0, 0.48], [1, 0.19], [1, 0.49], [0, 0.6], [0, 0.6], [1, 0.34], [1, 0.19]],1,0.48
 # split_on_numerical(d_set,a,sval) == ([[1, 0.25], [1, 0.19], [1, 0.34], [1, 0.19]],[[1, 0.89], [0, 0.93], [0, 0.48], [1, 0.49], [0, 0.6], [0, 0.6]])

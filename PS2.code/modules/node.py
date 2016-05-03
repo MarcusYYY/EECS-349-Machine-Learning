@@ -30,6 +30,7 @@ class Node:
         self.splitting_value = None
         self.children = {}
         self.name = None
+    
 
     def classify(self, instance):
         '''
