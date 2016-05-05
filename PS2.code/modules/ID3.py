@@ -213,9 +213,9 @@ def mode(data_set):
     
     for i in data_set:
         if i[0] == 1:
-            count_1++
+            count_1 += 1
         else:
-            count_0++
+            count_0 += 1
     if count_0 > count_1:
         return count_0
     else:
