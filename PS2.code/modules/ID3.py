@@ -24,8 +24,11 @@ def ID3(data_set, attribute_metadata, numerical_splits_count, depth):
 
 def ID3_helper(data_set, attribute_metadata, numerical_splits_count, depth):
     classList = [example[-1] for example in data_set]
+    #remaining values of this feature are all the same
     if classList.count(classList[0]) == len(classList):
         return classList[0]
+
+    # there is no remaining feature
     if len(data_set[0]) == 1
         return mode(classList)
 
