@@ -219,9 +219,9 @@ def mode(data_set):
         else:
             count_0 += 1
     if count_0 > count_1:
-        return count_0
+        return 0
     else:
-        return count_1
+        return 1
 
 # ======== Test case =============================
 # data_set = [[0],[1],[1],[1],[1],[1]]
@@ -400,7 +400,7 @@ def split_on_numerical(data_set, attribute, splitting_value):
         else:
             up.append([i[0],i[attribute]])
 
-    count_Attribute = (down,up)
+count_Attribute = (down,up)
     
     
     
