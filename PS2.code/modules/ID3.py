@@ -400,11 +400,7 @@ def split_on_numerical(data_set, attribute, splitting_value):
         else:
             up.append([i[0],i[attribute]])
 
-count_Attribute = (down,up)
-    
-    
-    
-    return count_Attribute
+    count_Attribute = (down,up)
     
     return count_Attribute
 
