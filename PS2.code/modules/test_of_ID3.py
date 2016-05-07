@@ -60,7 +60,7 @@ def mode(data_set):
         return 0
     else:
         return 1
-    pass
+
 # ======== Test case =============================
 # print "Test of mode(data_set)"
 # data_set = [[0],[1],[1],[1],[1],[1]]
@@ -165,7 +165,6 @@ def split_on_numerical(data_set, attribute, splitting_value):
         ========================================================================================================
         '''
     # Your code here
-    count_Attribute = []
     up = []
     down = []
     for i in data_set:
@@ -176,20 +175,24 @@ def split_on_numerical(data_set, attribute, splitting_value):
         else:
             up.append([i[0],i[attribute]])
 
-count_Attribute.append(down)
-    count_Attribute.append(up)
+count_Attribute = (down,up)
+    
+    
     
     return count_Attribute
 
 # ======== Test case =============================
-# print "test of split_on_numerical(data_set, attribute, splitting_value)"
+print "test of split_on_numerical(data_set, attribute, splitting_value)"
 
-# d_set,a,sval = [[1, 0.25], [1, 0.89], [0, 0.93], [0, 0.48], [1, 0.19], [1, 0.49], [0, 0.6], [0, 0.6], [1, 0.34],[1, 0.19]],1,0.48
+d_set,a,sval = [[1, 0.25], [1, 0.89], [0, 0.93], [0, 0.48], [1, 0.19], [1, 0.49], [0, 0.6], [0, 0.6], [1, 0.34],[1, 0.19]],1,0.48
 
-# print  str(split_on_numerical(d_set,a,sval)) + " should be ([[1, 0.25], [1, 0.19], [1, 0.34], [1, 0.19]],[[1, 0.89], [0, 0.93], [0, 0.48], [1, 0.49], [0, 0.6], [0, 0.6]])"
 
-# d_set,a,sval = [[0, 0.91], [0, 0.84], [1, 0.82], [1, 0.07], [0, 0.82],[0, 0.59], [0, 0.87], [0, 0.17], [1, 0.05], [1, 0.76]],1,0.17
-# print  str(split_on_numerical(d_set,a,sval)) + " should be ([[1, 0.07], [1, 0.05]],[[0, 0.91],[0, 0.84], [1, 0.82], [0, 0.82], [0, 0.59], [0, 0.87], [0, 0.17], [1, 0.76]])"
+print split_on_numerical(d_set,a,sval) == ([[1, 0.25], [1, 0.19], [1, 0.34], [1, 0.19]],[[1, 0.89], [0, 0.93], [0, 0.48], [1, 0.49], [0, 0.6], [0, 0.6]])
+print split_on_numerical(d_set,a,sval)
+
+d_set,a,sval = [[0, 0.91], [0, 0.84], [1, 0.82], [1, 0.07], [0, 0.82],[0, 0.59], [0, 0.87], [0, 0.17], [1, 0.05], [1, 0.76]],1,0.17
+print  split_on_numerical(d_set,a,sval) ==  ([[1, 0.07], [1, 0.05]],[[0, 0.91],[0, 0.84], [1, 0.82], [0, 0.82], [0, 0.59], [0, 0.87], [0, 0.17], [1, 0.76]])
+print  split_on_numerical(d_set,a,sval)
 
 def gain_ratio_numeric(data_set, attribute, steps):
     '''
@@ -354,7 +357,6 @@ def handle_unknown(attribute,data_set,attribute_metadata):
         for index in missing_idx:
             data_set[index][attribute] = mean_
 
-
 # ======== Test Cases =============================
 # print "Test of handle_unknown"
 #
@@ -377,3 +379,28 @@ def handle_unknown(attribute,data_set,attribute_metadata):
 #     print str(handle_unknown(1,data_set,attribute_metadata)) + " should be [[0,2],[1,3],[1,4],[0,4],[1,4],[0,4]]"
 # else:
 #     print "test2 passed"
+
+
+def check_homogenous(data_set):
+    '''
+        ========================================================================================================
+        Input:  A data_set
+        ========================================================================================================
+        Job:    Checks if the output value (index 0) is the same for all examples in the the data_set, if so return that output value, otherwise return None.
+        ========================================================================================================
+        Output: Return either the homogenous attribute or None
+        ========================================================================================================
+        '''
+    # Your code here
+    flag = data_set[0][0]
+    for i in data_set:
+        if i[0] != flag:
+            return None
+    return flag
+# ======== Test Cases =============================
+data_set = [[0],[1],[1],[1],[1],[1]]
+check_homogenous(data_set) ==  None
+data_set = [[0],[1],[None],[0]]
+check_homogenous(data_set) ==  None
+data_set = [[1],[1],[1],[1],[1],[1]]
+check_homogenous(data_set) ==  1
