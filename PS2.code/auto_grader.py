@@ -243,5 +243,13 @@ def check_ID3():
    if fails > 0:
       print "not all tests passed, please see ID3."
    else:
-      print "all tests passed."
+      print "all numerical tests passed."
+   attribute_metadata = [{'name': "winner",'is_nominal': True},{'name': "weather",'is_nominal': True}]
+   data_set = [[1, 0], [0, 1], [0, -1], [0, -1], [0, 1], [1, 0], [1, 0], [1, 1], [1, 0], [0, 1], [1, -1]]
+   numerical_splits_count = [5, 1]
+   n = ID3(data_set, attribute_metadata, numerical_splits_count, 1)
+   if n and [n.classify(x) == x[0] for x in data_set] == [True, True, True, True, True, True, True, False, True, True, False]:
+   	   print "Passed nominal test"
+   else:
+       print "Failed nominal test"
 test = grader( **options )
